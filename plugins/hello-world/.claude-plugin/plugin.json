@@ -1,8 +1,0 @@
-{
-  "name": "hello-world",
-  "description": "A simple example plugin for Claude Code",
-  "version": "1.0.0",
-  "author": {
-    "name": "Local Team"
-  }
-}

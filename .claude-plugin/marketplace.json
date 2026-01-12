@@ -1,20 +1,16 @@
 {
-  "name": "local-marketplace",
-  "description": "Local Claude Code plugin marketplace",
+  "name": "claude-plugin-marketplace-test",
+  "description": "Claude Code plugin marketplace for testing",
   "version": "1.0.0",
   "owner": {
     "name": "Local Team"
   },
   "plugins": [
     {
-      "name": "hello-world",
-      "source": "./plugins/hello-world",
-      "description": "A simple example plugin for Claude Code"
-    },
-    {
       "name": "project-scaffolding",
       "source": "./plugins/project-scaffolding",
-      "description": "Automatically generate fullstack project directory structure"
+      "gitUrl": "https://github.com/seungheesoo/project-scaffolding-plugin.git",
+      "description": "풀스택 프로젝트 구조를 자동 생성하는 Claude Code 플러그인"
     }
   ]
 }

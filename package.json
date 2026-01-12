@@ -1,7 +1,7 @@
 {
-  "name": "local-marketplace",
+  "name": "claude-plugin-marketplace-test",
   "version": "1.0.0",
-  "description": "Local Claude Code Plugin Marketplace Server",
+  "description": "Claude Code Plugin Marketplace Test Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

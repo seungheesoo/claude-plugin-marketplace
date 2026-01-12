@@ -1,13 +1,11 @@
 {
   "extraKnownMarketplaces": {
-    "local-marketplace": {
+    "claude-plugin-marketplace-test": {
       "source": {
         "type": "local",
-        "path": "C:\\Users\\승희수\\Desktop\\local-marketplace"
+        "path": "C:\\Users\\승희수\\Desktop\\claude-plugin-marketplace"
       }
     }
   },
-  "enabledPlugins": {
-    "hello-world@local-marketplace": true
-  }
+  "enabledPlugins": {}
 }

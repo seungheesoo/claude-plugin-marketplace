@@ -3,67 +3,848 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Code Plugin Marketplace</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Claude Plugin Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .copy-btn:active { transform: scale(0.95); }
+    :root {
+      --bg-base: #1a1b1e;
+      --bg-surface: #222326;
+      --bg-elevated: #2a2b2f;
+      --bg-hover: #303136;
+      --text-primary: #e4e4e7;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #7c9885;
+      --accent-hover: #8fad99;
+      --accent-subtle: rgba(124, 152, 133, 0.15);
+      --info: #6b8cae;
+      --info-subtle: rgba(107, 140, 174, 0.15);
+      --purple: #9a8bc4;
+      --purple-subtle: rgba(154, 139, 196, 0.15);
+      --danger: #c47a7a;
+      --danger-subtle: rgba(196, 122, 122, 0.15);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 2.5rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .brand h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      font-size: 0.95rem;
+    }
+
+    .add-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .add-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Controls */
+    .controls {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.875rem 1rem 0.875rem 2.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .registration-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+    }
+
+    .registration-card label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .cmd-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .cmd-row code {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--bg-base);
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      padding: 0.75rem 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .stats .count {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Plugin Grid */
+    .plugin-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .plugin-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .plugin-card:hover {
+      background: var(--bg-elevated);
+      border-color: var(--border-hover);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .card-title h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .version-badge {
+      padding: 0.2rem 0.5rem;
+      background: var(--bg-hover);
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 0.875rem;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .action-btn.primary {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    .action-btn.primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .action-btn.update {
+      background: transparent;
+      color: var(--info);
+      border-color: rgba(107, 140, 174, 0.3);
+    }
+
+    .action-btn.update:hover {
+      background: var(--info-subtle);
+    }
+
+    .action-btn.danger {
+      background: transparent;
+      color: var(--danger);
+      border-color: rgba(196, 122, 122, 0.3);
+    }
+
+    .action-btn.danger:hover {
+      background: var(--danger-subtle);
+    }
+
+    .card-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-git-url {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.875rem;
+    }
+
+    .meta-author {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Badges */
+    .badge-group {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .badge.commands {
+      background: var(--info-subtle);
+      color: var(--info);
+      border-color: rgba(107, 140, 174, 0.25);
+    }
+
+    .badge.commands:hover {
+      background: rgba(107, 140, 174, 0.25);
+    }
+
+    .badge.skills {
+      background: var(--purple-subtle);
+      color: var(--purple);
+      border-color: rgba(154, 139, 196, 0.25);
+    }
+
+    .badge.skills:hover {
+      background: rgba(154, 139, 196, 0.25);
+    }
+
+    .badge-count {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+    }
+
+    /* Install command */
+    .install-cmd {
+      background: var(--bg-base);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      overflow-x: auto;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+
+    .empty-state h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 2.5rem;
+      color: var(--text-muted);
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 0.75rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modal & Popup */
+    .modal-backdrop, .popup-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.active, .popup-backdrop.active {
+      display: flex;
+    }
+
+    .modal, .popup {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      animation: modalIn 0.2s ease;
+    }
+
+    .popup {
+      max-width: 380px;
+      max-height: 70vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-header, .popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-header h2, .popup-header h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    .popup-header h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .popup-header .badge-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .popup-header .badge-icon.commands { color: var(--info); }
+    .popup-header .badge-icon.skills { color: var(--purple); }
+
+    .modal-close, .popup-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover, .popup-close:hover {
+      color: var(--text-primary);
+    }
+
+    /* Popup content */
+    .popup-content {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .popup-list {
+      list-style: none;
+    }
+
+    .popup-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .popup-list li:last-child {
+      border-bottom: none;
+    }
+
+    .popup-list .item-name {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .popup-list .item-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .popup-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text-secondary);
+    }
+
+    .form-group label .required { color: var(--danger); }
+    .form-group label .optional { color: var(--text-muted); font-weight: 400; }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      resize: none;
+      min-height: 70px;
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+    }
+
+    .form-message {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .form-message.error {
+      display: block;
+      background: var(--danger-subtle);
+      border: 1px solid rgba(196, 122, 122, 0.3);
+      color: var(--danger);
+    }
+
+    .form-message.success {
+      display: block;
+      background: var(--accent-subtle);
+      border: 1px solid rgba(124, 152, 133, 0.3);
+      color: var(--accent);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+
+    .form-actions button {
+      flex: 1;
+      padding: 0.875rem;
+      border-radius: var(--radius);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-cancel:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-submit .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .spinner {
+      display: block;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.875rem 1.25rem;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      box-shadow: var(--shadow);
+      animation: toastIn 0.25s ease, toastOut 0.25s ease 2.5s forwards;
+      z-index: 2000;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateY(16px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container { padding: 1.5rem 1rem; }
+      .header-top { flex-direction: column; gap: 1rem; }
+      .add-btn { width: 100%; justify-content: center; }
+      .brand h1 { font-size: 1.5rem; }
+      .card-header { flex-direction: column; }
+      .card-actions { width: 100%; }
+      .card-actions .action-btn { flex: 1; }
+    }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen">
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <!-- Header -->
-    <header class="mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-white" id="marketplace-name">Plugin Marketplace</h1>
-        <p class="text-gray-400 mt-1" id="marketplace-desc">Loading...</p>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <h1 id="marketplace-name">Plugin Marketplace</h1>
+          <p id="marketplace-desc">Loading...</p>
+        </div>
+        <button class="add-btn" onclick="openModal()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add Plugin
+        </button>
       </div>
 
-      <!-- Search -->
-      <div class="mt-4 relative">
-        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search plugins..."
-          class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-          oninput="searchPlugins(this.value)"
-        >
-      </div>
-
-      <!-- Commands -->
-      <div class="mt-4 grid gap-3">
-        <!-- Marketplace Registration -->
-        <div class="bg-gray-800 rounded-lg p-4">
-          <p class="text-sm text-gray-400 mb-2">Marketplace Registration:</p>
-          <div class="flex items-center gap-2">
-            <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-green-400 text-sm" id="install-cmd">/plugin marketplace add http://localhost:4874/.claude-plugin/marketplace.json</code>
-            <button onclick="copyCommand()" class="copy-btn bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm">Copy</button>
-          </div>
+      <div class="controls">
+        <div class="search-box">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search plugins..." oninput="searchPlugins(this.value)">
         </div>
 
+        <div class="registration-card">
+          <label>Marketplace Registration</label>
+          <div class="cmd-row">
+            <code id="install-cmd">/plugin marketplace add http://localhost:4874/.claude-plugin/marketplace.json</code>
+            <button class="copy-btn" onclick="copyCommand()">Copy</button>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- Plugin Count -->
-    <div class="mb-4 text-gray-400">
-      <span id="plugin-count">0</span> plugins available
+    <div class="stats">
+      <span class="count" id="plugin-count">0</span>
+      <span>plugins available</span>
     </div>
 
-    <!-- Plugin Grid -->
-    <div id="plugin-list" class="grid gap-4">
-      <!-- Plugins will be loaded here -->
+    <div id="plugin-grid" class="plugin-grid"></div>
+
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading plugins...</p>
     </div>
 
-    <!-- Loading -->
-    <div id="loading" class="text-center py-8 text-gray-500">
-      Loading plugins...
+    <div id="error" class="empty-state" style="display: none;">
+      <p>Failed to load plugins</p>
     </div>
+  </div>
 
-    <!-- Error -->
-    <div id="error" class="hidden text-center py-8 text-red-400">
-      Failed to load plugins
+  <!-- Add Plugin Modal -->
+  <div id="modal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Plugin from Git</h2>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="add-form" onsubmit="submitPlugin(event)">
+        <div class="form-group">
+          <label>Git URL <span class="required">*</span></label>
+          <input type="url" id="input-url" placeholder="https://github.com/user/my-plugin.git" required>
+          <p class="form-hint">GitHub, GitLab, or any git repository</p>
+        </div>
+
+        <div class="form-group">
+          <label>Plugin Name <span class="optional">(optional)</span></label>
+          <input type="text" id="input-name" placeholder="my-plugin">
+          <p class="form-hint">Leave empty to extract from URL</p>
+        </div>
+
+        <div class="form-group">
+          <label>Description <span class="optional">(optional)</span></label>
+          <textarea id="input-desc" placeholder="A brief description..."></textarea>
+          <p class="form-hint">Leave empty to use plugin.json description</p>
+        </div>
+
+        <div id="form-error" class="form-message error"></div>
+        <div id="form-success" class="form-message success"></div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span class="spinner"></span>
+            <span class="btn-text">Add Plugin</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Commands/Skills Popup -->
+  <div id="popup" class="popup-backdrop">
+    <div class="popup">
+      <div class="popup-header">
+        <h2>
+          <svg class="badge-icon" id="popup-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+          <span id="popup-title">Items</span>
+        </h2>
+        <button class="popup-close" onclick="closePopup()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="popup-content">
+        <ul class="popup-list" id="popup-list"></ul>
+      </div>
     </div>
   </div>
 
@@ -72,79 +853,115 @@
     let marketplaceName = '';
 
     async function loadPlugins() {
-      const listEl = document.getElementById('plugin-list');
-      const loadingEl = document.getElementById('loading');
-      const errorEl = document.getElementById('error');
-      const countEl = document.getElementById('plugin-count');
+      const grid = document.getElementById('plugin-grid');
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
 
-      loadingEl.classList.remove('hidden');
-      errorEl.classList.add('hidden');
-      listEl.innerHTML = '';
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      grid.innerHTML = '';
 
       try {
-        // Load marketplace info
         const marketplaceRes = await fetch('/api/marketplace');
         const marketplace = await marketplaceRes.json();
         marketplaceName = marketplace.name || 'Plugin Marketplace';
         document.getElementById('marketplace-name').textContent = marketplaceName;
         document.getElementById('marketplace-desc').textContent = marketplace.description || '';
 
-        // Update install command with current URL
         const baseUrl = window.location.origin;
         document.getElementById('install-cmd').textContent = `/plugin marketplace add ${baseUrl}/.claude-plugin/marketplace.json`;
 
-        // Load plugins
         const pluginsRes = await fetch('/api/plugins');
         allPlugins = await pluginsRes.json();
 
-        loadingEl.classList.add('hidden');
+        loading.style.display = 'none';
         renderPlugins(allPlugins);
       } catch (err) {
-        loadingEl.classList.add('hidden');
-        errorEl.classList.remove('hidden');
+        loading.style.display = 'none';
+        error.style.display = 'block';
         console.error(err);
       }
     }
 
     function renderPlugins(plugins) {
-      const listEl = document.getElementById('plugin-list');
+      const grid = document.getElementById('plugin-grid');
       const countEl = document.getElementById('plugin-count');
 
       countEl.textContent = plugins.length;
-      listEl.innerHTML = '';
+      grid.innerHTML = '';
 
       if (plugins.length === 0) {
-        listEl.innerHTML = '<div class="text-center py-8 text-gray-500">No plugins found</div>';
+        grid.innerHTML = `
+          <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            <h3>No plugins yet</h3>
+            <p>Click "Add Plugin" to add your first plugin</p>
+          </div>
+        `;
         return;
       }
 
-      plugins.forEach(plugin => {
+      plugins.forEach((plugin, index) => {
         const card = document.createElement('div');
-        card.className = 'bg-gray-800 rounded-lg p-5 hover:bg-gray-750 transition-colors';
+        card.className = 'plugin-card';
+
+        const pluginNameEscaped = plugin.name.replace(/'/g, "\\'");
+
+        const commandsHtml = plugin.commands && plugin.commands.length > 0 ? `
+          <div class="badge commands" onclick="showCommandsPopup('${pluginNameEscaped}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Commands
+            <span class="badge-count">${plugin.commands.length}</span>
+          </div>
+        ` : '';
+
+        const skillsHtml = plugin.skills && plugin.skills.length > 0 ? `
+          <div class="badge skills" onclick="showSkillsPopup('${pluginNameEscaped}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Skills
+            <span class="badge-count">${plugin.skills.length}</span>
+          </div>
+        ` : '';
+
         card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-3">
-                <h2 class="text-xl font-semibold text-white">${plugin.name}</h2>
-                <span class="text-xs bg-gray-700 px-2 py-1 rounded">v${plugin.version}</span>
-              </div>
-              <p class="text-gray-400 mt-2">${plugin.description}</p>
-              <div class="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                <span>by ${plugin.author}</span>
-                ${plugin.commands ? '<span class="text-blue-400">Commands</span>' : ''}
-                ${plugin.skills ? '<span class="text-green-400">Skills</span>' : ''}
-              </div>
+          <div class="card-header">
+            <div class="card-title">
+              <h2>${escapeHtml(plugin.name)}</h2>
+              <span class="version-badge">v${escapeHtml(plugin.version)}</span>
             </div>
-            <button onclick="copyPluginInstall('${plugin.name}')" class="copy-btn bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm whitespace-nowrap">
-              Copy Install
-            </button>
+            <div class="card-actions">
+              <button class="action-btn primary" onclick="copyInstall('${escapeHtml(plugin.name)}')">Copy Install</button>
+              <button class="action-btn update" onclick="updatePlugin('${escapeHtml(plugin.name)}')">Update</button>
+              <button class="action-btn danger" onclick="deletePlugin('${escapeHtml(plugin.name)}')">Delete</button>
+            </div>
           </div>
-          <div class="mt-3 bg-gray-900 rounded px-3 py-2">
-            <code class="text-sm text-green-400">claude plugin install ${plugin.name}@${marketplaceName}</code>
+          <p class="card-description">${escapeHtml(plugin.description)}</p>
+          ${plugin.gitUrl ? `<p class="card-git-url" title="${escapeHtml(plugin.gitUrl)}">${escapeHtml(plugin.gitUrl)}</p>` : ''}
+          <div class="card-meta">
+            <span class="meta-author">by ${escapeHtml(plugin.author)}</span>
+            <div class="badge-group">
+              ${commandsHtml}
+              ${skillsHtml}
+            </div>
           </div>
+          <div class="install-cmd">claude plugin install ${escapeHtml(plugin.name)}@${escapeHtml(marketplaceName)}</div>
         `;
-        listEl.appendChild(card);
+
+        grid.appendChild(card);
       });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
     function searchPlugins(query) {
@@ -155,14 +972,15 @@
       }
 
       const filtered = allPlugins.filter(plugin =>
-        plugin.name.toLowerCase().includes(q)
+        plugin.name.toLowerCase().includes(q) ||
+        (plugin.description && plugin.description.toLowerCase().includes(q))
       );
       renderPlugins(filtered);
     }
 
     function copyToClipboard(text) {
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+        navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
       } else {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -172,8 +990,19 @@
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        alert('Copied!');
+        showToast('Copied to clipboard');
       }
+    }
+
+    function showToast(message) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
     }
 
     function copyCommand() {
@@ -181,12 +1010,218 @@
       copyToClipboard(cmd);
     }
 
-    function copyPluginInstall(pluginName) {
+    function copyInstall(pluginName) {
       const cmd = `claude plugin install ${pluginName}@${marketplaceName}`;
       copyToClipboard(cmd);
     }
 
-    // Load on page load
+    // Popup for commands
+    function showCommandsPopup(pluginName) {
+      const plugin = allPlugins.find(p => p.name === pluginName);
+      if (!plugin || !plugin.commands) return;
+
+      const popup = document.getElementById('popup');
+      const title = document.getElementById('popup-title');
+      const icon = document.getElementById('popup-icon');
+      const list = document.getElementById('popup-list');
+
+      title.textContent = 'Commands';
+      icon.className = 'badge-icon commands';
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>';
+
+      if (plugin.commands.length === 0) {
+        list.innerHTML = '<div class="popup-empty">No commands</div>';
+      } else {
+        list.innerHTML = plugin.commands.map(cmd => `
+          <li>
+            <div class="item-name">/${escapeHtml(cmd.name)}</div>
+            ${cmd.description ? `<div class="item-desc">${escapeHtml(cmd.description)}</div>` : ''}
+          </li>
+        `).join('');
+      }
+
+      popup.classList.add('active');
+    }
+
+    // Popup for skills
+    function showSkillsPopup(pluginName) {
+      const plugin = allPlugins.find(p => p.name === pluginName);
+      if (!plugin || !plugin.skills) return;
+
+      const popup = document.getElementById('popup');
+      const title = document.getElementById('popup-title');
+      const icon = document.getElementById('popup-icon');
+      const list = document.getElementById('popup-list');
+
+      title.textContent = 'Skills';
+      icon.className = 'badge-icon skills';
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>';
+
+      if (plugin.skills.length === 0) {
+        list.innerHTML = '<div class="popup-empty">No skills</div>';
+      } else {
+        list.innerHTML = plugin.skills.map(skill => `
+          <li>
+            <div class="item-name">${escapeHtml(skill.name)}</div>
+            ${skill.description ? `<div class="item-desc">${escapeHtml(skill.description)}</div>` : ''}
+          </li>
+        `).join('');
+      }
+
+      popup.classList.add('active');
+    }
+
+    function closePopup() {
+      document.getElementById('popup').classList.remove('active');
+    }
+
+    // Modal
+    function openModal() {
+      document.getElementById('modal').classList.add('active');
+      document.getElementById('input-url').focus();
+      clearFormMessages();
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      document.getElementById('add-form').reset();
+      clearFormMessages();
+    }
+
+    function clearFormMessages() {
+      document.getElementById('form-error').style.display = 'none';
+      document.getElementById('form-success').style.display = 'none';
+    }
+
+    function showFormError(msg) {
+      const el = document.getElementById('form-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+      document.getElementById('form-success').style.display = 'none';
+    }
+
+    function showFormSuccess(msg) {
+      const el = document.getElementById('form-success');
+      el.textContent = msg;
+      el.style.display = 'block';
+      document.getElementById('form-error').style.display = 'none';
+    }
+
+    function setSubmitLoading(loading) {
+      const btn = document.getElementById('submit-btn');
+      const text = btn.querySelector('.btn-text');
+      btn.disabled = loading;
+      if (loading) {
+        btn.classList.add('loading');
+        text.textContent = 'Adding...';
+      } else {
+        btn.classList.remove('loading');
+        text.textContent = 'Add Plugin';
+      }
+    }
+
+    async function submitPlugin(event) {
+      event.preventDefault();
+      clearFormMessages();
+      setSubmitLoading(true);
+
+      const gitUrl = document.getElementById('input-url').value.trim();
+      const name = document.getElementById('input-name').value.trim();
+      const description = document.getElementById('input-desc').value.trim();
+
+      const body = { gitUrl };
+      if (name) body.name = name;
+      if (description) body.description = description;
+
+      try {
+        const res = await fetch('/api/plugins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to add plugin');
+        }
+
+        showFormSuccess(`Plugin "${data.plugin.name}" added successfully!`);
+
+        setTimeout(() => {
+          closeModal();
+          loadPlugins();
+        }, 1200);
+
+      } catch (err) {
+        showFormError(err.message);
+      } finally {
+        setSubmitLoading(false);
+      }
+    }
+
+    async function updatePlugin(pluginName) {
+      if (!confirm(`Update "${pluginName}" to the latest version?`)) return;
+
+      try {
+        const res = await fetch(`/api/plugins/${encodeURIComponent(pluginName)}/update`, {
+          method: 'POST'
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to update plugin');
+        }
+
+        showToast(`Plugin "${pluginName}" updated to v${data.version}`);
+        loadPlugins();
+
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function deletePlugin(pluginName) {
+      if (!confirm(`Are you sure you want to delete "${pluginName}"?`)) return;
+
+      try {
+        const res = await fetch(`/api/plugins/${encodeURIComponent(pluginName)}`, {
+          method: 'DELETE'
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to delete plugin');
+        }
+
+        showToast(`Plugin "${pluginName}" deleted`);
+        loadPlugins();
+
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Close on backdrop click
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    document.getElementById('popup').addEventListener('click', (e) => {
+      if (e.target.id === 'popup') closePopup();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closePopup();
+      }
+    });
+
+    // Init
     loadPlugins();
   </script>
 </body>
