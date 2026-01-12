@@ -119,6 +119,19 @@ function extractPluginName(gitUrl) {
   return match ? match[1].replace('.git', '') : null;
 }
 
+// Get git remote URL from plugin's .git/config
+function getPluginGitUrl(pluginName) {
+  const gitConfigPath = path.join(PLUGINS_DIR, pluginName, '.git', 'config');
+  if (fs.existsSync(gitConfigPath)) {
+    const config = fs.readFileSync(gitConfigPath, 'utf8');
+    const urlMatch = config.match(/url\s*=\s*(.+)/);
+    if (urlMatch) {
+      return urlMatch[1].trim();
+    }
+  }
+  return null;
+}
+
 // API: Marketplace info
 app.get('/api/marketplace', (req, res) => {
   try {
@@ -137,13 +150,15 @@ app.get('/api/plugins', (req, res) => {
       const details = getPluginDetails(plugin.name);
       const commands = getPluginCommands(plugin.name);
       const skills = getPluginSkills(plugin.name);
+      const gitUrl = getPluginGitUrl(plugin.name);
 
       return {
         ...plugin,
         version: details?.version || '1.0.0',
         author: details?.author?.name || marketplace.owner?.name || 'Unknown',
         commands: commands,
-        skills: skills
+        skills: skills,
+        gitUrl: gitUrl
       };
     });
     res.json(plugins);
@@ -197,12 +212,11 @@ app.post('/api/plugins', (req, res) => {
     const details = getPluginDetails(pluginName);
     const pluginDescription = description || details?.description || 'No description';
 
-    // Add to marketplace.json
+    // Add to marketplace.json (gitUrl is NOT saved here to maintain Claude Code compatibility)
     const marketplace = getMarketplaceData();
     marketplace.plugins.push({
       name: pluginName,
       source: `./plugins/${pluginName}`,
-      gitUrl: gitUrl,
       description: pluginDescription
     });
     saveMarketplaceData(marketplace);

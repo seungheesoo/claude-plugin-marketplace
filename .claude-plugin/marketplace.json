@@ -9,7 +9,6 @@
     {
       "name": "project-scaffolding",
       "source": "./plugins/project-scaffolding",
-      "gitUrl": "https://github.com/seungheesoo/project-scaffolding-plugin.git",
       "description": "풀스택 프로젝트 구조를 자동 생성하는 Claude Code 플러그인"
     }
   ]
