@@ -31,8 +31,8 @@ app.get('/', (req, res, next) => {
       const result = {
         ...marketplace,
         plugins: marketplace.plugins.map(plugin => {
-          // Get git URL from .git/config (HTTPS format)
-          let gitUrl = getPluginGitUrl(plugin.name);
+          // Use stored gitUrl first, then try .git/config
+          let gitUrl = plugin.gitUrl || getPluginGitUrl(plugin.name);
 
           // Convert SSH URL to HTTPS if needed
           if (gitUrl && gitUrl.startsWith('git@github.com:')) {
@@ -44,15 +44,21 @@ app.get('/', (req, res, next) => {
             gitUrl = gitUrl + '.git';
           }
 
+          // Only return plugin if we have a valid git URL
+          if (!gitUrl) {
+            console.warn(`Warning: No git URL found for plugin '${plugin.name}'`);
+            return null;
+          }
+
           return {
             name: plugin.name,
             description: plugin.description,
-            source: gitUrl ? {
+            source: {
               source: "url",
               url: gitUrl
-            } : plugin.source  // Fallback to original source if no git URL
+            }
           };
-        })
+        }).filter(Boolean)  // Remove null entries
       };
 
       return res.json(result);
@@ -268,11 +274,12 @@ app.post('/api/plugins', (req, res) => {
     const details = getPluginDetails(pluginName);
     const pluginDescription = description || details?.description || 'No description';
 
-    // Add to marketplace.json (gitUrl is NOT saved here to maintain Claude Code compatibility)
+    // Add to marketplace.json with gitUrl for Claude Code compatibility
     const marketplace = getMarketplaceData();
     marketplace.plugins.push({
       name: pluginName,
       source: `./plugins/${pluginName}`,
+      gitUrl: gitUrl,  // Store git URL for Claude Code
       description: pluginDescription
     });
     saveMarketplaceData(marketplace);
@@ -361,7 +368,8 @@ app.get('/.claude-plugin/marketplace.json', (req, res) => {
     const result = {
       ...marketplace,
       plugins: marketplace.plugins.map(plugin => {
-        let gitUrl = getPluginGitUrl(plugin.name);
+        // Use stored gitUrl first, then try .git/config
+        let gitUrl = plugin.gitUrl || getPluginGitUrl(plugin.name);
 
         // Convert SSH URL to HTTPS if needed
         if (gitUrl && gitUrl.startsWith('git@github.com:')) {
@@ -373,15 +381,21 @@ app.get('/.claude-plugin/marketplace.json', (req, res) => {
           gitUrl = gitUrl + '.git';
         }
 
+        // Only return plugin if we have a valid git URL
+        if (!gitUrl) {
+          console.warn(`Warning: No git URL found for plugin '${plugin.name}'`);
+          return null;
+        }
+
         return {
           name: plugin.name,
           description: plugin.description,
-          source: gitUrl ? {
+          source: {
             source: "url",
             url: gitUrl
-          } : plugin.source
+          }
         };
-      })
+      }).filter(Boolean)  // Remove null entries
     };
 
     res.json(result);
