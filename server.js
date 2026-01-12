@@ -9,6 +9,25 @@ const PORT = 4874;
 // JSON body parser
 app.use(express.json());
 
+// Root URL handler - return marketplace.json for Claude Code, index.html for browsers
+app.get('/', (req, res, next) => {
+  // Check if request accepts JSON (Claude Code) or HTML (browser)
+  const acceptHeader = req.headers.accept || '';
+
+  // If client wants JSON or doesn't accept HTML, return marketplace.json
+  if (acceptHeader.includes('application/json') || !acceptHeader.includes('text/html')) {
+    try {
+      const marketplace = getMarketplaceData();
+      return res.json(marketplace);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Otherwise, serve index.html
+  next();
+});
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
