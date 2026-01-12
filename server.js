@@ -25,17 +25,20 @@ app.get('/', (req, res, next) => {
   if (acceptHeader.includes('application/json') || !acceptHeader.includes('text/html')) {
     try {
       const marketplace = getMarketplaceData();
+      const baseUrl = getBaseUrl(req);
 
-      // Convert relative source paths to git URLs for Claude Code
+      // Convert relative source paths to server URL format for Claude Code
+      // Plugins are served directly from this server, not from GitHub
       const result = {
         ...marketplace,
-        plugins: marketplace.plugins.map(plugin => {
-          const gitUrl = getPluginGitUrl(plugin.name);
-          return {
-            ...plugin,
-            source: gitUrl || plugin.source
-          };
-        })
+        plugins: marketplace.plugins.map(plugin => ({
+          name: plugin.name,
+          description: plugin.description,
+          source: {
+            source: "url",
+            url: `${baseUrl}/plugins/${plugin.name}`
+          }
+        }))
       };
 
       return res.json(result);
@@ -339,17 +342,19 @@ app.delete('/api/plugins/:name', (req, res) => {
 app.get('/.claude-plugin/marketplace.json', (req, res) => {
   try {
     const marketplace = getMarketplaceData();
+    const baseUrl = getBaseUrl(req);
 
-    // Convert relative source paths to git URLs for Claude Code
+    // Convert relative source paths to server URL format for Claude Code
     const result = {
       ...marketplace,
-      plugins: marketplace.plugins.map(plugin => {
-        const gitUrl = getPluginGitUrl(plugin.name);
-        return {
-          ...plugin,
-          source: gitUrl || plugin.source
-        };
-      })
+      plugins: marketplace.plugins.map(plugin => ({
+        name: plugin.name,
+        description: plugin.description,
+        source: {
+          source: "url",
+          url: `${baseUrl}/plugins/${plugin.name}`
+        }
+      }))
     };
 
     res.json(result);
