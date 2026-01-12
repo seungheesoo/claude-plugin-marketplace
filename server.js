@@ -27,18 +27,32 @@ app.get('/', (req, res, next) => {
       const marketplace = getMarketplaceData();
       const baseUrl = getBaseUrl(req);
 
-      // Convert relative source paths to server URL format for Claude Code
-      // Plugins are served directly from this server, not from GitHub
+      // Convert to proper source format for Claude Code
       const result = {
         ...marketplace,
-        plugins: marketplace.plugins.map(plugin => ({
-          name: plugin.name,
-          description: plugin.description,
-          source: {
-            source: "url",
-            url: `${baseUrl}/plugins/${plugin.name}`
+        plugins: marketplace.plugins.map(plugin => {
+          // Get git URL from .git/config (HTTPS format)
+          let gitUrl = getPluginGitUrl(plugin.name);
+
+          // Convert SSH URL to HTTPS if needed
+          if (gitUrl && gitUrl.startsWith('git@github.com:')) {
+            gitUrl = gitUrl.replace('git@github.com:', 'https://github.com/');
           }
-        }))
+
+          // Ensure .git extension for proper git clone
+          if (gitUrl && !gitUrl.endsWith('.git')) {
+            gitUrl = gitUrl + '.git';
+          }
+
+          return {
+            name: plugin.name,
+            description: plugin.description,
+            source: gitUrl ? {
+              source: "url",
+              url: gitUrl
+            } : plugin.source  // Fallback to original source if no git URL
+          };
+        })
       };
 
       return res.json(result);
@@ -342,19 +356,32 @@ app.delete('/api/plugins/:name', (req, res) => {
 app.get('/.claude-plugin/marketplace.json', (req, res) => {
   try {
     const marketplace = getMarketplaceData();
-    const baseUrl = getBaseUrl(req);
 
-    // Convert relative source paths to server URL format for Claude Code
+    // Convert to proper source format for Claude Code
     const result = {
       ...marketplace,
-      plugins: marketplace.plugins.map(plugin => ({
-        name: plugin.name,
-        description: plugin.description,
-        source: {
-          source: "url",
-          url: `${baseUrl}/plugins/${plugin.name}`
+      plugins: marketplace.plugins.map(plugin => {
+        let gitUrl = getPluginGitUrl(plugin.name);
+
+        // Convert SSH URL to HTTPS if needed
+        if (gitUrl && gitUrl.startsWith('git@github.com:')) {
+          gitUrl = gitUrl.replace('git@github.com:', 'https://github.com/');
         }
-      }))
+
+        // Ensure .git extension for proper git clone
+        if (gitUrl && !gitUrl.endsWith('.git')) {
+          gitUrl = gitUrl + '.git';
+        }
+
+        return {
+          name: plugin.name,
+          description: plugin.description,
+          source: gitUrl ? {
+            source: "url",
+            url: gitUrl
+          } : plugin.source
+        };
+      })
     };
 
     res.json(result);
