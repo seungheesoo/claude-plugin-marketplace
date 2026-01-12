@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "local-marketplace": {
+      "source": {
+        "type": "local",
+        "path": "C:\\Users\\승희수\\Desktop\\local-marketplace"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "hello-world@local-marketplace": true
+  }
+}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Plugin Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .copy-btn:active { transform: scale(0.95); }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <header class="mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-white" id="marketplace-name">Plugin Marketplace</h1>
+        <p class="text-gray-400 mt-1" id="marketplace-desc">Loading...</p>
+      </div>
+
+      <!-- Search -->
+      <div class="mt-4 relative">
+        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search plugins..."
+          class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+          oninput="searchPlugins(this.value)"
+        >
+      </div>
+
+      <!-- Commands -->
+      <div class="mt-4 grid gap-3">
+        <!-- Marketplace Registration -->
+        <div class="bg-gray-800 rounded-lg p-4">
+          <p class="text-sm text-gray-400 mb-2">Marketplace Registration:</p>
+          <div class="flex items-center gap-2">
+            <code class="flex-1 bg-gray-900 px-3 py-2 rounded text-green-400 text-sm" id="install-cmd">/plugin marketplace add http://localhost:4874/.claude-plugin/marketplace.json</code>
+            <button onclick="copyCommand()" class="copy-btn bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Plugin Count -->
+    <div class="mb-4 text-gray-400">
+      <span id="plugin-count">0</span> plugins available
+    </div>
+
+    <!-- Plugin Grid -->
+    <div id="plugin-list" class="grid gap-4">
+      <!-- Plugins will be loaded here -->
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="text-center py-8 text-gray-500">
+      Loading plugins...
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden text-center py-8 text-red-400">
+      Failed to load plugins
+    </div>
+  </div>
+
+  <script>
+    let allPlugins = [];
+    let marketplaceName = '';
+
+    async function loadPlugins() {
+      const listEl = document.getElementById('plugin-list');
+      const loadingEl = document.getElementById('loading');
+      const errorEl = document.getElementById('error');
+      const countEl = document.getElementById('plugin-count');
+
+      loadingEl.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+      listEl.innerHTML = '';
+
+      try {
+        // Load marketplace info
+        const marketplaceRes = await fetch('/api/marketplace');
+        const marketplace = await marketplaceRes.json();
+        marketplaceName = marketplace.name || 'Plugin Marketplace';
+        document.getElementById('marketplace-name').textContent = marketplaceName;
+        document.getElementById('marketplace-desc').textContent = marketplace.description || '';
+
+        // Update install command with current URL
+        const baseUrl = window.location.origin;
+        document.getElementById('install-cmd').textContent = `/plugin marketplace add ${baseUrl}/.claude-plugin/marketplace.json`;
+
+        // Load plugins
+        const pluginsRes = await fetch('/api/plugins');
+        allPlugins = await pluginsRes.json();
+
+        loadingEl.classList.add('hidden');
+        renderPlugins(allPlugins);
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+        console.error(err);
+      }
+    }
+
+    function renderPlugins(plugins) {
+      const listEl = document.getElementById('plugin-list');
+      const countEl = document.getElementById('plugin-count');
+
+      countEl.textContent = plugins.length;
+      listEl.innerHTML = '';
+
+      if (plugins.length === 0) {
+        listEl.innerHTML = '<div class="text-center py-8 text-gray-500">No plugins found</div>';
+        return;
+      }
+
+      plugins.forEach(plugin => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-800 rounded-lg p-5 hover:bg-gray-750 transition-colors';
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold text-white">${plugin.name}</h2>
+                <span class="text-xs bg-gray-700 px-2 py-1 rounded">v${plugin.version}</span>
+              </div>
+              <p class="text-gray-400 mt-2">${plugin.description}</p>
+              <div class="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                <span>by ${plugin.author}</span>
+                ${plugin.commands ? '<span class="text-blue-400">Commands</span>' : ''}
+                ${plugin.skills ? '<span class="text-green-400">Skills</span>' : ''}
+              </div>
+            </div>
+            <button onclick="copyPluginInstall('${plugin.name}')" class="copy-btn bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm whitespace-nowrap">
+              Copy Install
+            </button>
+          </div>
+          <div class="mt-3 bg-gray-900 rounded px-3 py-2">
+            <code class="text-sm text-green-400">claude plugin install ${plugin.name}@${marketplaceName}</code>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function searchPlugins(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        renderPlugins(allPlugins);
+        return;
+      }
+
+      const filtered = allPlugins.filter(plugin =>
+        plugin.name.toLowerCase().includes(q)
+      );
+      renderPlugins(filtered);
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Copied!');
+      }
+    }
+
+    function copyCommand() {
+      const cmd = document.getElementById('install-cmd').textContent;
+      copyToClipboard(cmd);
+    }
+
+    function copyPluginInstall(pluginName) {
+      const cmd = `claude plugin install ${pluginName}@${marketplaceName}`;
+      copyToClipboard(cmd);
+    }
+
+    // Load on page load
+    loadPlugins();
+  </script>
+</body>
+</html>

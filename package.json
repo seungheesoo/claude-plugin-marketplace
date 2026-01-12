@@ -1,0 +1,12 @@
+{
+  "name": "local-marketplace",
+  "version": "1.0.0",
+  "description": "Local Claude Code Plugin Marketplace Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

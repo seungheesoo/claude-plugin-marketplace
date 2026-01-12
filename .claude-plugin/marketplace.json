@@ -1,0 +1,20 @@
+{
+  "name": "local-marketplace",
+  "description": "Local Claude Code plugin marketplace",
+  "version": "1.0.0",
+  "owner": {
+    "name": "Local Team"
+  },
+  "plugins": [
+    {
+      "name": "hello-world",
+      "source": "./plugins/hello-world",
+      "description": "A simple example plugin for Claude Code"
+    },
+    {
+      "name": "project-scaffolding",
+      "source": "./plugins/project-scaffolding",
+      "description": "Automatically generate fullstack project directory structure"
+    }
+  ]
+}
