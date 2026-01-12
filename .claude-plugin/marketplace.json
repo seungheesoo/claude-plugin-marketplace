@@ -3,20 +3,7 @@
   "description": "Claude Code plugin marketplace for testing",
   "version": "1.0.0",
   "owner": {
-    "name": "Local Team"
+    "name": "DEEPNOID - Platform R&D Center:Development"
   },
-  "plugins": [
-    {
-      "name": "project-scaffolding",
-      "source": "./plugins/project-scaffolding",
-      "gitUrl": "https://github.com/seungheesoo/project-scaffolding-plugin.git",
-      "description": "풀스택 프로젝트 구조를 자동 생성하는 Claude Code 플러그인"
-    },
-    {
-      "name": "sdd",
-      "source": "./plugins/sdd",
-      "gitUrl": "https://github.com/jhmin1126/sdd.git",
-      "description": "Spec-Driven Development workflow plugin for Claude Code"
-    }
-  ]
+  "plugins": []
 }
