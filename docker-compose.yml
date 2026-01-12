@@ -1,0 +1,9 @@
+services:
+  marketplace:
+    build: .
+    container_name: claude-plugin-marketplace
+    ports:
+      - "4874:4874"
+    volumes:
+      - ./plugins:/app/plugins
+    restart: unless-stopped
