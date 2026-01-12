@@ -759,7 +759,7 @@
         <div class="registration-card">
           <label>Marketplace Registration</label>
           <div class="cmd-row">
-            <code id="install-cmd">/plugin marketplace add http://localhost:4874/.claude-plugin/marketplace.json</code>
+            <code id="install-cmd">/plugin marketplace add http://localhost:4874</code>
             <button class="copy-btn" onclick="copyCommand()">Copy</button>
           </div>
         </div>
@@ -869,7 +869,7 @@
         document.getElementById('marketplace-desc').textContent = marketplace.description || '';
 
         const baseUrl = window.location.origin;
-        document.getElementById('install-cmd').textContent = `/plugin marketplace add ${baseUrl}/.claude-plugin/marketplace.json`;
+        document.getElementById('install-cmd').textContent = `/plugin marketplace add ${baseUrl}`;
 
         const pluginsRes = await fetch('/api/plugins');
         allPlugins = await pluginsRes.json();
